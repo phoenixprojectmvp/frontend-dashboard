@@ -1,12 +1,10 @@
 import './App.css';
-import LoginPage from './pages/LoginPage.jsx'; // ייבוא העמוד החדש
+import DashboardPage from './pages/DashboardPage.jsx'; // ייבוא העמוד החדש
 
 function App() {
   return (
     <div>
-      <h1>Phoenix Project Dashboard</h1>
-      <hr />
-      <LoginPage /> {/* הצגת העמוד החדש */}
+      <DashboardPage /> {/* הצגת העמוד החדש */}
     </div>
   )
 }
