@@ -10,7 +10,7 @@ function InboxList() {
     const fetchConversations = async () => {
       try {
         // התיקון: הוספנו מירכאות סביב הטוקן כדי להפוך אותו למחרוזת חוקית
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjo3LCJhY2NvdW50SWQiOjEsIm5hbWUiOiJUYW1pciIsImlhdCI6MTc1MTA1OTY1NCwiZXhwIjoxNzUxMDYzMjU0fQ.LvTwU0b13yyNe5-IjDM2f4DyV1bzGaRoJyAiRrrpZSQ"; 
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2VudElkIjo3LCJhY2NvdW50SWQiOjEsIm5hbWUiOiJUYW1pciIsImlhdCI6MTc1MTA4OTI5MCwiZXhwIjoxNzUxMDkyODkwfQ.1Z_wW-cKmjyBKE1ybXh-0sUGa1Um2CX-cWRCeIzFNtc"; 
 
         const response = await axios.get('http://localhost:3001/api/conversations', {
           headers: {
