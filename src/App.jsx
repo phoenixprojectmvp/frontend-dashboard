@@ -1,23 +1,15 @@
-import './App.css';
-import { useAuth } from './context/AuthContext.jsx';
-import LoginPage from './pages/LoginPage.jsx';
-import DashboardPage from './pages/DashboardPage.jsx';
+import { Outlet } from 'react-router-dom'; // 1. ייבוא של קומפוננטת Outlet
 
 function App() {
-  // 1. שולפים את סטטוס האימות מה-Context הגלובלי
-  const { isAuthenticated } = useAuth();
-
   return (
-    <div className="App">
+    <div>
       <h1>Phoenix Project Dashboard</h1>
       <hr />
 
-      {/* 2. מציגים קומפוננטה אחרת בהתאם לשאלה אם המשתמש מחובר */}
-      {isAuthenticated ? (
-        <DashboardPage /> // אם כן, הצג את הדשבורד
-      ) : (
-        <LoginPage />     // אם לא, הצג את עמוד הלוגין
-      )}
+      <main>
+        {/* 2. כאן יוצגו העמודים שהגדרנו ב-router */}
+        <Outlet />
+      </main>
     </div>
   )
 }

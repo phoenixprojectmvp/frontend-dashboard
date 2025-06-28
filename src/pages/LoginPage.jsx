@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext'; // 1. מייבאים את ה-Hook שלנו
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom'; // 1. ייבוא של useNavigate
 
 function LoginPage() {
   const [email, setEmail] = useState('test@test.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState('');
 
-  const { login, token } = useAuth(); // 2. משתמשים ב-Hook כדי לקבל את פונקציית ה-login ואת הטוקן
+  const { login } = useAuth();
+  const navigate = useNavigate(); // 2. יצירת פונקציית הניווט
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,13 +21,13 @@ function LoginPage() {
         password: password
       });
 
-      // 3. במקום לשמור ב-state מקומי, אנחנו קוראים לפונקציית ה-login מה-Context
-      login(response.data.token);
+      login(response.data.token); // שומרים את הטוקן ב-Context הגלובלי
 
-      console.log('Login successful! Token stored in context.');
+      // 3. אחרי שהתחברנו, נווט אוטומטית לדשבורד
+      navigate('/dashboard'); 
 
     } catch (err) {
-      console.error('Login failed:', err.response ? err.response.data : err.message);
+      console.error('Login failed:', err.response ? err.response.data : 'Login failed!');
       setError(err.response ? err.response.data : 'Login failed!');
     }
   };
@@ -58,8 +60,6 @@ function LoginPage() {
       </form>
 
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {/* 4. מציגים את הטוקן מה-Context הגלובלי, לא ממקומי */}
-      {token && <p style={{ color: 'green' }}>Login Successful! Token is now stored globally.</p>}
     </div>
   );
 }
