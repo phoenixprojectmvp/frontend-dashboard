@@ -1,10 +1,23 @@
 import './App.css';
-import DashboardPage from './pages/DashboardPage.jsx'; // ייבוא העמוד החדש
+import { useAuth } from './context/AuthContext.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
 
 function App() {
+  // 1. שולפים את סטטוס האימות מה-Context הגלובלי
+  const { isAuthenticated } = useAuth();
+
   return (
-    <div>
-      <DashboardPage /> {/* הצגת העמוד החדש */}
+    <div className="App">
+      <h1>Phoenix Project Dashboard</h1>
+      <hr />
+
+      {/* 2. מציגים קומפוננטה אחרת בהתאם לשאלה אם המשתמש מחובר */}
+      {isAuthenticated ? (
+        <DashboardPage /> // אם כן, הצג את הדשבורד
+      ) : (
+        <LoginPage />     // אם לא, הצג את עמוד הלוגין
+      )}
     </div>
   )
 }

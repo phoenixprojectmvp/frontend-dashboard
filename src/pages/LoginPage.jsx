@@ -1,32 +1,30 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // 1. ייבוא של ספריית axios
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext'; // 1. מייבאים את ה-Hook שלנו
 
 function LoginPage() {
-  const [email, setEmail] = useState('test@test.com'); // נשים ערכי ברירת מחדל לנוחות
+  const [email, setEmail] = useState('test@test.com');
   const [password, setPassword] = useState('password');
-  const [error, setError] = useState(''); // State להצגת הודעות שגיאה
-  const [token, setToken] = useState('');   // State לשמירת הטוקן שנקבל
+  const [error, setError] = useState('');
 
-  // 2. הפכנו את הפונקציה לאסינכרונית כדי שנוכל להשתמש ב-await
+  const { login, token } = useAuth(); // 2. משתמשים ב-Hook כדי לקבל את פונקציית ה-login ואת הטוקן
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(''); // איפוס שגיאות קודמות
-    setToken(''); // איפוס טוקן קודם
+    setError('');
 
     try {
-      // 3. שליחת בקשת POST ל-API שלנו עם האימייל והסיסמה
       const response = await axios.post('http://localhost:3001/api/auth/login', {
         email: email,
         password: password
       });
 
-      // 4. אם הבקשה הצליחה, נשמור את הטוקן מהתגובה
-      const receivedToken = response.data.token;
-      console.log('Login successful! Token:', receivedToken);
-      setToken(receivedToken);
+      // 3. במקום לשמור ב-state מקומי, אנחנו קוראים לפונקציית ה-login מה-Context
+      login(response.data.token);
+
+      console.log('Login successful! Token stored in context.');
 
     } catch (err) {
-      // 5. אם השרת החזיר שגיאה, נציג אותה
       console.error('Login failed:', err.response ? err.response.data : err.message);
       setError(err.response ? err.response.data : 'Login failed!');
     }
@@ -58,10 +56,10 @@ function LoginPage() {
         </div>
         <button type="submit" style={{ marginTop: '10px' }}>Login</button>
       </form>
-      
-      {/* 6. הצגת הודעת שגיאה או הצלחה למשתמש */}
+
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-      {token && <p style={{ color: 'green' }}>Login Successful! Token received.</p>}
+      {/* 4. מציגים את הטוקן מה-Context הגלובלי, לא ממקומי */}
+      {token && <p style={{ color: 'green' }}>Login Successful! Token is now stored globally.</p>}
     </div>
   );
 }
