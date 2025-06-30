@@ -1,9 +1,8 @@
 import React from 'react';
 
-// קומפוננטה זו מקבלת את רשימת השיחות כ-prop
-function InboxList({ conversations, onConversationSelect }) {
-  if (conversations.length === 0) {
-    return <p>No conversations yet.</p>;
+function InboxList({ conversations, onConversationSelect, selectedConversationId }) {
+  if (!conversations || conversations.length === 0) {
+    return <p>No active conversations.</p>;
   }
 
   return (
@@ -14,7 +13,13 @@ function InboxList({ conversations, onConversationSelect }) {
           <li
             key={convo.id}
             onClick={() => onConversationSelect(convo.id)}
-            style={{ padding: '10px', borderBottom: '1px solid #eee', cursor: 'pointer' }}
+            style={{ 
+              padding: '10px', 
+              borderBottom: '1px solid #eee', 
+              cursor: 'pointer',
+              // שינוי צבע הרקע אם השיחה נבחרה
+              backgroundColor: convo.id === selectedConversationId ? '#e1f5fe' : 'transparent'
+            }}
           >
             Conversation ID: {convo.id} - Status: {convo.status}
           </li>

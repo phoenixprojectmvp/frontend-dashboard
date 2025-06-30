@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import InboxList from '../components/InboxList';
-import ConversationView from '../components/ConversationView';
-import NewConversationForm from '../components/NewConversationForm';
+import { io } from 'socket.io-client';
+import InboxList from '../components/InboxList.jsx';
+import ConversationView from '../components/ConversationView.jsx';
+import NewConversationForm from '../components/NewConversationForm.jsx';
 
 function DashboardPage() {
   const [conversations, setConversations] = useState([]);
@@ -12,7 +13,6 @@ function DashboardPage() {
   const [selectedConversationId, setSelectedConversationId] = useState(null);
   const { token } = useAuth();
 
-  // עטפנו את קריאת ה-API בפונקציה שנוכל לקרוא לה שוב
   const fetchConversations = useCallback(async () => {
     if (!token) {
       setLoading(false);
@@ -22,7 +22,7 @@ function DashboardPage() {
       const response = await axios.get('http://localhost:3001/api/conversations', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      setConversations(response.data.conversations);
+      setConversations(response.data.conversations || []);
     } catch (err) {
       setError('Failed to fetch conversations.');
     } finally {
@@ -30,29 +30,46 @@ function DashboardPage() {
     }
   }, [token]);
 
-  // ה-useEffect רץ פעם אחת כשהדף נטען
   useEffect(() => {
     fetchConversations();
+    
+    const socket = io('http://localhost:3001');
+
+    socket.on('new_conversation', (newConversation) => {
+        // הוספת השיחה החדשה לראש הרשימה
+        setConversations(prev => [newConversation, ...prev]);
+    });
+
+    return () => {
+        socket.disconnect();
+    };
   }, [fetchConversations]);
 
-  if (loading) return <div>Loading conversations...</div>;
+  // פונקציה שתטפל ביצירת שיחה ותבחר אותה אוטומטית
+  const handleConversationCreated = () => {
+    fetchConversations();
+  };
+
+  if (loading) return <div>Loading...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
     <div>
       <h2>Agent Dashboard</h2>
-      <div style={{ display: 'flex', gap: '20px', padding: '20px' }}>
+      <div style={{ display: 'flex', gap: '20px' }}>
         <div style={{ flex: 1 }}>
-          {/* העברנו את הפונקציה לרענון הרשימה לטופס */}
-          <NewConversationForm onConversationCreated={fetchConversations} />
+          <NewConversationForm onConversationCreated={handleConversationCreated} />
           <hr style={{ margin: '20px 0' }} />
           <InboxList 
             conversations={conversations} 
-            onConversationSelect={setSelectedConversationId} 
+            onConversationSelect={setSelectedConversationId}
+            selectedConversationId={selectedConversationId} // מעבירים את ה-ID הנבחר
           />
         </div>
         <div style={{ flex: 2 }}>
-          <ConversationView conversationId={selectedConversationId} />
+          <ConversationView 
+            conversationId={selectedConversationId} 
+          />
         </div>
       </div>
     </div>

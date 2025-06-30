@@ -31,13 +31,11 @@ function ConversationView({ conversationId, onReply }) {
     fetchConversation();
     
     const socket = io('http://localhost:3001');
-    const room = `conversation:${conversationId}`;
     if(conversationId) {
         socket.emit('join_conversation', conversationId);
     }
 
     socket.on('new_message', (newMessage) => {
-      // עדכון השיחה רק אם היא השיחה הנוכחית שמוצגת
       setConversation(prev => {
         if (!prev || prev.id !== conversationId) return prev;
         return { ...prev, messages: [...prev.messages, newMessage] };
@@ -57,7 +55,6 @@ function ConversationView({ conversationId, onReply }) {
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       setReplyText('');
-      // אנחנו לא מעדכנים כאן את ה-state, כי השרת ישדר את העדכון חזרה
     } catch (error) {
       alert('Failed to send reply.');
     }

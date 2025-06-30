@@ -26,7 +26,7 @@ function NewConversationForm({ onConversationCreated }) {
         onConversationCreated();
       }
     } catch (err) {
-      setError('Failed to create conversation. Is the End User ID correct?');
+      setError('Failed to create conversation.');
       console.error(err);
     }
   };
