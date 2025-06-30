@@ -6,11 +6,11 @@ function ConversationView({ conversationId }) {
   const [conversation, setConversation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [replyText, setReplyText] = useState(''); // State חדש עבור ההודעה של הנציג
   const { token } = useAuth();
 
   useEffect(() => {
-    if (!conversationId || !token) {
+    // אל תעשה כלום אם לא נבחרה שיחה
+    if (!conversationId) {
       setConversation(null);
       return;
     }
@@ -25,63 +25,36 @@ function ConversationView({ conversationId }) {
         setConversation(response.data);
       } catch (err) {
         setError('Failed to fetch conversation details.');
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchConversation();
-  }, [conversationId, token]);
-
-  // --- פונקציה חדשה לשליחת תשובה ---
-  const handleReplySubmit = async (e) => {
-    e.preventDefault();
-    if (!replyText.trim()) return;
-
-    try {
-      const response = await axios.post(
-        `http://localhost:3001/api/conversations/${conversationId}/messages`,
-        { text: replyText },
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
-
-      // עדכון ה-state עם השיחה המעודכנת מהשרת
-      setConversation(response.data);
-      setReplyText(''); // ניקוי תיבת הטקסט
-    } catch (error) {
-      alert('Failed to send reply.');
-      console.error(error);
-    }
-  };
+  }, [conversationId, token]); // ה-Hook ירוץ מחדש כל פעם שבוחרים שיחה אחרת
 
   if (loading) return <p>Loading conversation...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!conversation) return <p>Select a conversation to view its details.</p>;
 
+  // אם אין הודעות, נציג מערך ריק כדי למנוע קריסה
   const messages = conversation.messages || [];
 
   return (
     <div>
       <h4>Conversation ID: {conversation.id} (Status: {conversation.status})</h4>
       <div style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'auto', background: 'white' }}>
-        {messages.map((msg, index) => (
-          <div key={index} style={{ margin: '5px 0', padding: '8px', background: msg.sender === 'agent' ? '#e1f5fe' : '#f0f0f0', borderRadius: '5px' }}>
-            <strong>{msg.sender}:</strong> {msg.text}
-          </div>
-        ))}
+        {messages.length > 0 ? (
+          messages.map((msg, index) => (
+            <div key={index} style={{ margin: '5px 0' }}>
+              <strong>{msg.sender}:</strong> {msg.text}
+            </div>
+          ))
+        ) : (
+          <p>No messages in this conversation yet.</p>
+        )}
       </div>
-
-      {/* --- טופס חדש לשליחת תשובה --- */}
-      <form onSubmit={handleReplySubmit} style={{ marginTop: '10px' }}>
-        <input
-          type="text"
-          value={replyText}
-          onChange={(e) => setReplyText(e.target.value)}
-          placeholder="Type your reply..."
-          style={{ width: '80%', padding: '5px' }}
-        />
-        <button type="submit">Reply</button>
-      </form>
     </div>
   );
 }
