@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
-// הקומפוננטה מקבלת פונקציה חדשה כ-prop
 function NewConversationForm({ onConversationCreated }) {
-  const [endUserId, setEndUserId] = useState('1'); // נתחיל עם ערך ברירת מחדל
+  const [endUserId, setEndUserId] = useState('1');
   const [firstMessage, setFirstMessage] = useState('');
   const [error, setError] = useState('');
   const { token } = useAuth();
@@ -12,20 +11,20 @@ function NewConversationForm({ onConversationCreated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+    if (!endUserId || !firstMessage) {
+      setError('Please fill out all fields.');
+      return;
+    }
     try {
       await axios.post(
         'http://localhost:3001/api/conversations',
         { endUserId: parseInt(endUserId, 10), firstMessage },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
-      setFirstMessage(''); // איפוס הטופס
-
-      // קריאה לפונקציה מההורה כדי לעדכן את הרשימה
+      setFirstMessage('');
       if (onConversationCreated) {
         onConversationCreated();
       }
-
     } catch (err) {
       setError('Failed to create conversation. Is the End User ID correct?');
       console.error(err);
@@ -38,22 +37,11 @@ function NewConversationForm({ onConversationCreated }) {
       <form onSubmit={handleSubmit}>
         <div>
           <label>End User ID: </label>
-          <input
-            type="number"
-            value={endUserId}
-            onChange={(e) => setEndUserId(e.target.value)}
-            placeholder="e.g., 1"
-          />
+          <input type="number" value={endUserId} onChange={(e) => setEndUserId(e.target.value)} />
         </div>
         <div style={{ marginTop: '10px' }}>
           <label>First Message:</label>
-          <textarea
-            value={firstMessage}
-            onChange={(e) => setFirstMessage(e.target.value)}
-            rows="3"
-            style={{ width: '95%' }}
-            placeholder="Type a message..."
-          />
+          <textarea value={firstMessage} onChange={(e) => setFirstMessage(e.target.value)} rows="3" style={{ width: '95%' }} />
         </div>
         <button type="submit" style={{ marginTop: '10px' }}>Create</button>
       </form>
