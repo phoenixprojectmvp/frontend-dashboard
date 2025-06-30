@@ -1,0 +1,65 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+
+// הקומפוננטה מקבלת פונקציה חדשה כ-prop
+function NewConversationForm({ onConversationCreated }) {
+  const [endUserId, setEndUserId] = useState('1'); // נתחיל עם ערך ברירת מחדל
+  const [firstMessage, setFirstMessage] = useState('');
+  const [error, setError] = useState('');
+  const { token } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await axios.post(
+        'http://localhost:3001/api/conversations',
+        { endUserId: parseInt(endUserId, 10), firstMessage },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      setFirstMessage(''); // איפוס הטופס
+
+      // קריאה לפונקציה מההורה כדי לעדכן את הרשימה
+      if (onConversationCreated) {
+        onConversationCreated();
+      }
+
+    } catch (err) {
+      setError('Failed to create conversation. Is the End User ID correct?');
+      console.error(err);
+    }
+  };
+
+  return (
+    <div style={{ border: '1px solid #ccc', padding: '10px', marginTop: '20px' }}>
+      <h4>Create New Conversation</h4>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>End User ID: </label>
+          <input
+            type="number"
+            value={endUserId}
+            onChange={(e) => setEndUserId(e.target.value)}
+            placeholder="e.g., 1"
+          />
+        </div>
+        <div style={{ marginTop: '10px' }}>
+          <label>First Message:</label>
+          <textarea
+            value={firstMessage}
+            onChange={(e) => setFirstMessage(e.target.value)}
+            rows="3"
+            style={{ width: '95%' }}
+            placeholder="Type a message..."
+          />
+        </div>
+        <button type="submit" style={{ marginTop: '10px' }}>Create</button>
+      </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </div>
+  );
+}
+
+export default NewConversationForm;
