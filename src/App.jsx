@@ -1,17 +1,12 @@
-import { Outlet } from 'react-router-dom'; // 1. ייבוא של קומפוננטת Outlet
+import LoginPage from './pages/LoginPage.jsx';
 
 function App() {
   return (
-    <div>
-      <h1>Phoenix Project Dashboard</h1>
-      <hr />
-
-      <main>
-        {/* 2. כאן יוצגו העמודים שהגדרנו ב-router */}
-        <Outlet />
-      </main>
+    <div style={{ padding: '20px' }}>
+      <h1>Phoenix Project</h1>
+      <LoginPage />
     </div>
-  )
+  );
 }
 
 export default App;

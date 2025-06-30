@@ -1,34 +1,29 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom'; // 1. ייבוא של useNavigate
 
 function LoginPage() {
   const [email, setEmail] = useState('test@test.com');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState('');
-
-  const { login } = useAuth();
-  const navigate = useNavigate(); // 2. יצירת פונקציית הניווט
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     try {
       const response = await axios.post('http://localhost:3001/api/auth/login', {
         email: email,
         password: password
       });
-
-      login(response.data.token); // שומרים את הטוקן ב-Context הגלובלי
-
-      // 3. אחרי שהתחברנו, נווט אוטומטית לדשבורד
-      navigate('/dashboard'); 
+      
+      console.log('Token received:', response.data.token);
+      setSuccessMessage('Login successful! Token received.');
 
     } catch (err) {
-      console.error('Login failed:', err.response ? err.response.data : 'Login failed!');
-      setError(err.response ? err.response.data : 'Login failed!');
+      console.error('Login failed:', err);
+      setError('Login failed. Please check credentials.');
     }
   };
 
@@ -58,8 +53,9 @@ function LoginPage() {
         </div>
         <button type="submit" style={{ marginTop: '10px' }}>Login</button>
       </form>
-
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+      
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
     </div>
   );
 }
