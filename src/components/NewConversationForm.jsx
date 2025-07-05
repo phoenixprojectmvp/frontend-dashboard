@@ -16,12 +16,21 @@ function NewConversationForm({ onConversationCreated }) {
       return;
     }
     try {
+      // --- התיקון כאן ---
+      // שיניתי את שמות המפתחות כדי שיתאימו למה שהשרת מצפה לקבל
+      // endUserId -> end_user_id
+      // firstMessage -> first_message
       await axios.post(
         'http://localhost:3001/api/conversations',
-        { endUserId: parseInt(endUserId, 10), firstMessage },
+        { 
+          end_user_id: parseInt(endUserId, 10), 
+          first_message: firstMessage 
+        },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
+      
       setFirstMessage('');
+      // קורא לפונקציה שמרעננת את רשימת השיחות בדאשבורד
       if (onConversationCreated) {
         onConversationCreated();
       }
