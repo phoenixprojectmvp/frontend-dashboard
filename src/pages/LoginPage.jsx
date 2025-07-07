@@ -1,3 +1,10 @@
+// ====================================================================
+// קובץ: frontend-dashboard/src/pages/LoginPage.jsx
+// סטטוס: הקוד תקין. אין צורך בשינויים.
+// אבחון: בעיית הבקשות המרובות נבעה מתקלה בשרת שגרמה לו לא להגיב.
+// התיקון שבוצע ב-backend-api/index.js פותר את שורש הבעיה.
+// ====================================================================
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
